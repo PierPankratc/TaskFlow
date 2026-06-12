@@ -9,6 +9,7 @@ class Users(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(nullable=False, default='123')
 
     todos: Mapped[list["Todo"]] = relationship(back_populates='users')
 

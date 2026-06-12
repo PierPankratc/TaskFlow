@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 class UserSchema(BaseModel):
     name: str
-    model_config = {'extra': 'forbid'}
+    password: str = Field(min_length=10, max_length=30)
 
 class TaskSchema(BaseModel):
     task: str

@@ -9,9 +9,16 @@ router = APIRouter(prefix='/user', tags=['Пользователи'])
 @router.post('/login')
 def login(user: UserSchema, db: Session = Depends(get_db_connect)):
     # Ищем пользователя по имени
-    new_user = db.query(Users).filter(Users.name == user.name).first()
+    new_user = db.query(Users).filter(Users.name == user.name).first() 
     if new_user:
-        return {'Auth': True, 'user_id': new_user.id}
+        authorizetad_user =  db.query(Users).filter(Users.name == user.name and Users.password == user.password).first()
+        if not authorizetad_user:
+             return {'User': user.name,
+                     'creditionals': {'user.name': 'access',
+                     'password': 'incorrect'    
+                     }}
+       
+        return {'Auth': True, 'user_id': authorizetad_user.id}
     else:
         # Создаём нового пользователя
         new_user = Users(name=user.name)
@@ -21,7 +28,7 @@ def login(user: UserSchema, db: Session = Depends(get_db_connect)):
         return {'Auth': True, 'user_id': new_user.id, 'message': 'Пользователь создан'}
     
 @router.post('/add_task/{id}')
-def add_task(id: int, task: TaskSchema, db: Session = Depends(get_db_connect)):
+def add_task( task: TaskSchema, db: Session = Depends(get_db_connect), id: Depends(login()['user_id'])):
         user = db.query(Users).filter(Users.id == id).first()
         if not user:
              return {'User': None}
