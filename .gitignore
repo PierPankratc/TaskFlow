@@ -3,7 +3,5 @@
 .venv/
 .vscode/
 todo.db
-*env.py
-alembic/script.py.mako
 alembic/README
 alembic.ini
