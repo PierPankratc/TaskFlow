@@ -45,24 +45,33 @@ fastapi/
 ##  Установка и запуск
 
 bash
+```
 git clone https://github.com/PierPankratc/fastapi.git
+```
+```
 cd fastapi
-
+```
 
 
 bash
+```
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 # или
 .venv\Scripts\activate      # Windows
+```
 
 
 bash
+```
 pip install -r requirements.txt
+```
 
 
 bash
+```
 uvicorn main:app --reload
+```
 
 
 - Swagger UI: http://localhost:8000/docs
