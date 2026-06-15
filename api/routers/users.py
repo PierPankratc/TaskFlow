@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Response
 from fastapi.security import OAuth2PasswordBearer
 from db.create_db import get_db_connect 
 from api.schemas import UserSchema, ProjectSchema, TaskSchema, SubTaskSchema
@@ -7,18 +7,22 @@ from db.models import Users, Projects, Tasks, SubTasks
 import jwt as PYjwt
 from datetime import datetime, timedelta
 from typing import Optional
+from authx import AuthX, AuthXConfig
 
 router = APIRouter(prefix='/user', tags=['Пользователи'])
 
-# OAuth2 схема (для Swagger)
 
+config = AuthXConfig()
+config.JWT_SECRET_KEY = 'ggg'
+config.JWT_ACCESS_COOKIE_NAME = 'access_token'
+config.JWT_TOKEN_LOCATION = ['cookies']
 
-# ===== ФУНКЦИИ АВТОРИЗАЦИИ =====
+security = AuthX(config=config)
 
 # ===== ЭНДПОИНТЫ =====
 
 @router.post('/login')
-def login(user: UserSchema, db: Session = Depends(get_db_connect)):
+def login(user: UserSchema, response: Response, db: Session = Depends(get_db_connect)):
     # Проверяем пользователя
     db_user = db.query(Users).filter(Users.name == user.name).first()
     
@@ -28,38 +32,30 @@ def login(user: UserSchema, db: Session = Depends(get_db_connect)):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
+        
     elif db_user.password != user.password:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    return {'id': db_user.id, 
-            'name': db_user.name}
+    # Создаём токен
+    token = security.create_access_token(uid=str(db_user.id))
+    response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
+    return {'token': token}
     
 
 
-@router.post('/add_project')
-def add_project(project: ProjectSchema, id: int, db: Session = Depends(get_db_connect)):
+@router.post('/add_task')
+def add_task(
+    task: TaskSchema, 
+    db: Session = Depends(get_db_connect), 
     
-    user_ =  db.query(Users).filter(id == Users.id).first()
-    if not user_:
-        raise HTTPException(status_code=404, detail='User not found')
-        
-    project_ =  db.query(Projects).filter(Projects.user_id == id, Projects.title == project.title).first()
-    if project_:
-        return {
-            'Error': 'вы уже записали данный проект',
-            'title': project.title
-            }
-        
-            
-    new_project = Projects(
-        user_id = id,
-        title = project.title,
-        deadline = project.deadline,
-        status = project.status,
-        priority = project.priority
-        )
+):
 
-    db.add(new_project)
+    new_task = Todo(
+        task=task.task,
+        status=task.status if task.status else False,
+        user_id=current_user.id
+    )
+    db.add(new_task)
     db.commit()
     db.refresh(new_project)
     return {
