@@ -7,7 +7,7 @@ from db.models import Users, Projects, Tasks, SubTasks
 import jwt as PYjwt
 from datetime import datetime, timedelta
 from typing import Optional
-from authx import AuthX, AuthXConfig
+from authx import AuthX, AuthXConfig, TokenPayload
 
 router = APIRouter(prefix='/user', tags=['Пользователи'])
 
@@ -16,6 +16,7 @@ config = AuthXConfig()
 config.JWT_SECRET_KEY = 'ggg'
 config.JWT_ACCESS_COOKIE_NAME = 'access_token'
 config.JWT_TOKEN_LOCATION = ['cookies']
+config.JWT_COOKIE_CSRF_PROTECT = False
 
 security = AuthX(config=config)
 
@@ -43,19 +44,31 @@ def login(user: UserSchema, response: Response, db: Session = Depends(get_db_con
     
 
 
-@router.post('/add_task')
-def add_task(
-    task: TaskSchema, 
-    db: Session = Depends(get_db_connect), 
+@router.post('/add_project')
+def add_project(project: ProjectSchema, db: Session = Depends(get_db_connect), payload: TokenPayload = Depends(security.access_token_required)):
+    uid = int(payload.sub)
+    user_ =  db.query(Users).filter(Users.id == uid).first()
     
-):
+    if not user_:
+        raise HTTPException(status_code=404, detail='User not found')
+        
+    project_ =  db.query(Projects).filter(Projects.user_id == uid, Projects.title == project.title).first()
+    if project_:
+        return {
+            'Error': 'вы уже записали данный проект',
+            'title': project.title
+            }
+        
+            
+    new_project = Projects(
+        user_id = uid,
+        title = project.title,
+        deadline = project.deadline,
+        status = project.status,
+        priority = project.priority
+        )
 
-    new_task = Todo(
-        task=task.task,
-        status=task.status if task.status else False,
-        user_id=current_user.id
-    )
-    db.add(new_task)
+    db.add(new_project)
     db.commit()
     db.refresh(new_project)
     return {
@@ -66,20 +79,57 @@ def add_task(
         'user_id': new_project.user_id
     }
 
-@router.get('{id}/pr')
-def ge_pr(uid: int, db: Session = Depends(get_db_connect)):
-    user_ =  db.query(Users).filter(id == Users.id).first()
-    if not user_:
-        raise HTTPException(status_code=404, detail='User not found')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @router.post('/add_task', dependencies=[Depends(security.access_token_required)])
+# def add_task(
+#     task: TaskSchema, 
+#     db: Session = Depends(get_db_connect), 
     
-    pr = db.query(Projects).filter(Projects.user_id == uid).all()
-    lst = []
-    for p in pr:
-        lst.append({
-            'id': p.id,
-            'title': p.title
-        })
-    return {'prs': lst}
+# ):
+
+#     new_task = Todo(
+#         task=task.task,
+#         status=task.status if task.status else False,
+#         user_id=
+#     )
+#     db.add(new_task)
+#     db.commit()
+#     db.refresh(new_project)
+#     return {
+#         'id': new_project.id,
+#         'task': new_project.title,
+#         'status': new_project.status,
+#         'deadline': new_project.deadline,
+#         'user_id': new_project.user_id
+#     }
+
+# @router.get('{id}/pr')
+# def ge_pr(uid: int, db: Session = Depends(get_db_connect)):
+#     user_ =  db.query(Users).filter(id == Users.id).first()
+#     if not user_:
+#         raise HTTPException(status_code=404, detail='User not found')
+    
+#     pr = db.query(Projects).filter(Projects.user_id == uid).all()
+#     lst = []
+#     for p in pr:
+#         lst.append({
+#             'id': p.id,
+#             'title': p.title
+#         })
+#     return {'prs': lst}
 
 
           
