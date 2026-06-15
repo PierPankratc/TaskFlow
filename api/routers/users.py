@@ -70,10 +70,23 @@ def add_project(project: ProjectSchema, id: int, db: Session = Depends(get_db_co
         'user_id': new_project.user_id
     }
 
-
+@router.get('{id}/pr')
+def ge_pr(uid: int, db: Session = Depends(get_db_connect)):
+    user_ =  db.query(Users).filter(id == Users.id).first()
+    if not user_:
+        raise HTTPException(status_code=404, detail='User not found')
     
+    pr = db.query(Projects).filter(Projects.user_id == uid).all()
+    lst = []
+    for p in pr:
+        lst.append({
+            'id': p.id,
+            'title': p.title
+        })
+    return {'prs': lst}
 
-    
+
+          
 
 
 # @router.get('/my_tasks')
