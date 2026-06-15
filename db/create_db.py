@@ -1,6 +1,7 @@
 # db/create_db.py
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from .models import Base
 
 # Движок для SQLite
 engine = create_engine(url='sqlite:///todo.db', echo=True)
@@ -15,3 +16,8 @@ def get_db_connect():
         yield db
     finally:
         db.close()
+
+def create_db():
+    Base.metadata.create_all(bind=engine)
+
+create_db()
