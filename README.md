@@ -78,49 +78,26 @@ Todo-list/
 
 ### Локальный запуск (для разработки)
 
-**1. Клонируйте репозиторий**
 ```bash
 git clone https://github.com/PierPankratc/Todo-list.git
 cd Todo-list
-
-2. Создайте и активируйте виртуальное окружение
-bash
 
 python -m venv .venv
 source .venv/bin/activate  # Для Mac/Linux
 # или
 .venv\Scripts\activate      # Для Windows
 
-3. Установите зависимости
-bash
-
 pip install -r requirements.txt
 
-4. Запустите сервер
-bash
-
 uvicorn main:app --reload
-
-5. Откройте документацию в браузере
 
     Swagger UI: http://localhost:8000/docs
 
     ReDoc: http://localhost:8000/redoc
 
-Способ 2: Запуск с помощью Docker
-
-1. Соберите образ
-bash
-
 docker build -t taskflow-api .
 
-2. Запустите контейнер
-bash
-
 docker run -d -p 8000:8000 --name taskflow taskflow-api
-
-3. Остановите контейнер
-bash
 
 docker stop taskflow
 docker rm taskflow
