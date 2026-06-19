@@ -47,7 +47,7 @@ class Tasks(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'))
+    project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'), default=0)
     title: Mapped[str] = mapped_column(nullable=False)
     created: Mapped[datetime] = mapped_column(default=datetime.now())
     deadline: Mapped[datetime] = mapped_column(nullable=True)
@@ -74,7 +74,7 @@ class SubTasks(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id'))
+    task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id'), default=0) 
     title: Mapped[str] = mapped_column(nullable=False)
     created: Mapped[datetime] = mapped_column(default=datetime.now())
     deadline: Mapped[datetime] = mapped_column(nullable=True)
