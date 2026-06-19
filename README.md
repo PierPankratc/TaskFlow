@@ -79,7 +79,7 @@ Todo-list/
 ### Локальный запуск (для разработки)
 
 ```bash
-git clone https://github.com/PierPankratc/Todo-list.git
+git clone https://github.com/PierPankratc/TaskFlow.git
 cd Todo-list
 
 python -m venv .venv
