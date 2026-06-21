@@ -6,7 +6,7 @@ from db.create_db import get_db_connect
 from db.models import Users
 
 config = AuthXConfig()
-config.JWT_SECRET_KEY = 'gggfgbtgbttggfff'
+config.JWT_SECRET_KEY = 'gggfgbtgbttggfffgggfgbtgbttggfff'
 config.JWT_ACCESS_COOKIE_NAME = 'access_token'
 config.JWT_TOKEN_LOCATION = ['cookies']
 config.JWT_COOKIE_CSRF_PROTECT = False
