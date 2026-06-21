@@ -9,6 +9,16 @@ class TestAuth:
         assert "token" in data
         assert "access_token" in response.cookies
 
+    def test_password_stored_hashed(self, client, db_session):
+        from db.models import Users
+
+        client.post("/login", json={"name": "hashed_user", "password": "secret123"})
+
+        user = db_session.query(Users).filter(Users.name == "hashed_user").first()
+        assert user is not None
+        assert user.password != "secret123"
+        assert user.password.startswith("$2")
+
     def test_login_existing_user(self, client):
         client.post("/login", json={"name": "bob", "password": "pass"})
         response = client.post(

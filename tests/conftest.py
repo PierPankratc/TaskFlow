@@ -41,6 +41,15 @@ def client():
         yield test_client
 
 
+@pytest.fixture
+def db_session():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 def login(client, name="testuser", password="testpass123"):
     response = client.post("/login", json={"name": name, "password": password})
     assert response.status_code == 200

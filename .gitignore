@@ -6,3 +6,4 @@
 todo.db
 alembic/README
 alembic.ini
+pyrightconfig.json
