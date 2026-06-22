@@ -37,19 +37,19 @@ class TestAuth:
         assert response.status_code == 401
 
     def test_access_without_token(self, client):
-        response = client.get("/projectget_all")
-        assert response.status_code == 500
+        response = client.get("/project/get_all")
+        assert response.status_code == 401
 
     def test_access_with_invalid_token(self, client):
         client.cookies.set("access_token", "invalid_token")
-        response = client.get("/projectget_all")
-        assert response.status_code == 500
+        response = client.get("/project/get_all")
+        assert response.status_code == 401
 
     def test_access_with_valid_cookie(self, auth_client):
         client = auth_client
         client.post("/project/add", json={"title": "Проект"})
 
-        response = client.get("/projectget_all")
+        response = client.get("/project/get_all")
         assert response.status_code == 200
         projects = response.json()
         assert isinstance(projects, list)

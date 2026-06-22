@@ -6,7 +6,7 @@ class TestProjects:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["task"] == "Новый проект"
+        assert data["title"] == "Новый проект"
         assert data["status"] == "in_progress"
         assert data["user_id"] == 1
         assert "id" in data
@@ -14,10 +14,7 @@ class TestProjects:
     def test_add_project_duplicate(self, auth_client):
         auth_client.post("/project/add", json={"title": "Дубликат"})
         response = auth_client.post("/project/add", json={"title": "Дубликат"})
-        assert response.status_code == 200
-        data = response.json()
-        assert "Error" in data
-        assert data["title"] == "Дубликат"
+        assert response.status_code == 409
 
     def test_get_all_projects(self, auth_client):
         for i in range(3):
@@ -26,7 +23,7 @@ class TestProjects:
                 json={"title": f"Проект {i}"},
             )
 
-        response = auth_client.get("/projectget_all")
+        response = auth_client.get("/project/get_all")
         assert response.status_code == 200
         projects = response.json()
         assert isinstance(projects, list)

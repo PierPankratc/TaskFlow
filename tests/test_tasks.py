@@ -34,7 +34,7 @@ class TestTasks:
                 json={"title": f"Задача {i}", "project_id": project_id, "deadline": None},
             )
 
-        response = auth_client.get("/tasksget_all")
+        response = auth_client.get("/tasks/get_all")
         assert response.status_code == 200
         tasks = response.json()
         assert isinstance(tasks, list)

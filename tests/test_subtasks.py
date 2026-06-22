@@ -34,7 +34,7 @@ class TestSubtasks:
                 json={"title": f"Подзадача {i}", "task_id": task_id, "deadline": None},
             )
 
-        response = auth_client.get("/subtasksget_all")
+        response = auth_client.get("/subtasks/get_all")
         assert response.status_code == 200
         subtasks = response.json()
         assert isinstance(subtasks, list)
@@ -49,9 +49,20 @@ class TestSubtasks:
         response = auth_client.get(f"/tasks/task/{task_id}")
         assert response.status_code == 200
         data = response.json()
-        assert data["summary"]["total_subtasks"] == 0
+        assert data["summary"]["total_subtasks"] == 2
 
     def test_delete_subtask_without_confirm(self, auth_client, subtask_id):
         response = auth_client.delete(f"/subtasks/del/{subtask_id}")
         assert response.status_code == 200
         assert response.json() == {"confirm": "подтвердите удаление"}
+
+    def test_delete_subtask_with_confirm(self, auth_client, task_id, subtask_id):
+        response = auth_client.delete(f"/subtasks/del/{subtask_id}?confirm=true")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["del_subtask_id"] == subtask_id
+        assert data["status"] == "deleted"
+
+        get_response = auth_client.get(f"/tasks/task/{task_id}")
+        assert get_response.status_code == 200
+        assert get_response.json()["summary"]["total_subtasks"] == 0

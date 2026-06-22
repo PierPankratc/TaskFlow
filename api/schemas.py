@@ -21,8 +21,8 @@ class ProjectSchema(BaseModel):
 
 class TaskSchema(BaseModel):
     title: str = Field(max_length=50)
-    project_id: int | None
-    deadline: datetime | None
+    project_id: int | None = None
+    deadline: datetime | None = None
     status: Literal["new", "in_progress", "done"] = "new"
     priority: Literal['low', 'middle', 'high'] = 'low'
     
@@ -30,8 +30,8 @@ class TaskSchema(BaseModel):
 
 class SubTaskSchema(BaseModel):
     title: str = Field(max_length=50)
-    task_id: int | None
-    deadline: datetime | None
+    task_id: int | None = None
+    deadline: datetime | None = None
     status: Literal["new", "in_progress", "done"] = "new"
     priority: Literal['low', 'middle', 'high'] = 'low'
     

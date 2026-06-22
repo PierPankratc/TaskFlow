@@ -1,15 +1,13 @@
-# db/create_db.py
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .models import Base
 
-# Движок для SQLite
-engine = create_engine(url='sqlite:///todo.db', echo=True)
+from api.config import DATABASE_URL, SQL_ECHO
+from db.models import Base
 
-# Фабрика сессий
+engine = create_engine(url=DATABASE_URL, echo=SQL_ECHO)
 SessionLocal = sessionmaker(bind=engine)
 
-# Зависимость для получения сессии в эндпоинтах
+
 def get_db_connect():
     db = SessionLocal()
     try:
@@ -17,7 +15,6 @@ def get_db_connect():
     finally:
         db.close()
 
+
 def create_db():
     Base.metadata.create_all(bind=engine)
-
-create_db()
